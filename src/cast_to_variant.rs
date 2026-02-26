@@ -173,7 +173,7 @@ impl ScalarUDFImpl for CastToVariantUdf {
     fn return_type(&self, _arg_types: &[DataType]) -> Result<DataType> {
         Ok(DataType::Struct(Fields::from(vec![
             Field::new("metadata", DataType::BinaryView, false),
-            Field::new("value", DataType::BinaryView, true),
+            Field::new("value", DataType::BinaryView, false),
         ])))
     }
 
@@ -298,7 +298,7 @@ mod tests {
             return_field.data_type(),
             &DataType::Struct(Fields::from(vec![
                 Field::new("metadata", DataType::BinaryView, false),
-                Field::new("value", DataType::BinaryView, true),
+                Field::new("value", DataType::BinaryView, false),
             ]))
         );
     }
