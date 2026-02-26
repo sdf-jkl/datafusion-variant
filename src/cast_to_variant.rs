@@ -385,9 +385,9 @@ mod tests {
         ));
 
         let mut builder = FixedSizeBinaryBuilder::with_capacity(3, 16);
-        builder.append_value(&[1u8; 16]).unwrap();
+        builder.append_value([1u8; 16]).unwrap();
         builder.append_null();
-        builder.append_value(&[2u8; 16]).unwrap();
+        builder.append_value([2u8; 16]).unwrap();
         let array = builder.finish();
 
         let args = ScalarFunctionArgs {
