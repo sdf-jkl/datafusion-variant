@@ -1,0 +1,79 @@
+# tests the variant_contains udf
+
+# Test 1: simple object key lookup
+query B
+SELECT variant_contains(json_to_variant('{"a": 1, "nested": {"b": 2}}'), 'a');
+----
+true
+
+# Test 2: nested lookup with multiple path elements
+query B
+SELECT variant_contains(json_to_variant('{"a": {"b": 2}}'), 'a', 'b');
+----
+true
+
+# Test 3: missing nested lookup
+query B
+SELECT variant_contains(json_to_variant('{"a": {"b": 2}}'), 'a', 'c');
+----
+false
+
+# Test 4: integer index lookup on a list
+query B
+SELECT variant_contains(json_to_variant('[10, 20, 30]'), 1);
+----
+true
+
+# Test 5: null path element returns false
+query B
+SELECT variant_contains(json_to_variant('{"a": 1}'), CAST(NULL AS TEXT));
+----
+false
+
+# Test 6: dotted keys are treated as a single field
+query B
+SELECT variant_contains(json_to_variant('{"a.b": 1}'), 'a.b');
+----
+true
+
+query B
+SELECT variant_contains(json_to_variant('{"a.b": 1}'), 'a', 'b');
+----
+false
+
+statement ok
+CREATE TABLE variant_contains_data (id INT, json_str TEXT, path TEXT) AS VALUES
+  (1, '{"a": 1}', 'a'),
+  (2, '{"b": 2}', 'a'),
+  (3, '{"a.b": 3}', 'a.b');
+
+# Test 7: variant array + scalar path
+query IT
+SELECT id, CAST(variant_contains(json_to_variant(json_str), 'a') AS TEXT)
+FROM variant_contains_data
+ORDER BY id;
+----
+1 true
+2 false
+3 false
+
+# Test 8: variant array + array path (column)
+query IT
+SELECT id, CAST(variant_contains(json_to_variant(json_str), path) AS TEXT)
+FROM variant_contains_data
+ORDER BY id;
+----
+1 true
+2 false
+3 true
+
+# Test 9: scalar variant + array path (column)
+query IT
+SELECT id, CAST(variant_contains(json_to_variant('[10, 20]'), idx) AS TEXT)
+FROM (VALUES (1, 0), (2, 1), (3, CAST(NULL AS BIGINT)), (4, -1)) AS t(id, idx)
+ORDER BY id;
+----
+1 true
+2 true
+3 false
+4 false
