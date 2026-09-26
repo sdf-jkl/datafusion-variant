@@ -79,7 +79,7 @@ impl ScalarUDFImpl for VariantObjectConstruct {
 
         let all_value_fields_have_variant_ext = value_fields
             .iter()
-            .all(|(_, v)| matches!(v.extension_type(), VariantType));
+            .all(|(_, v)| v.has_valid_extension_type::<VariantType>());
 
         ensure(
             all_value_fields_have_variant_ext,

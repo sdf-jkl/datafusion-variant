@@ -72,7 +72,7 @@ impl ScalarUDFImpl for VariantListInsert {
 
         let all_arguments_variant_field = argument_fields
             .iter()
-            .all(|f| matches!(f.extension_type(), VariantType));
+            .all(|f| f.has_valid_extension_type::<VariantType>());
 
         ensure(
             all_arguments_variant_field,

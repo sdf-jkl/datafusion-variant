@@ -75,7 +75,7 @@ impl ScalarUDFImpl for VariantListConstruct {
 
         let all_variant_fields = argument_fields
             .iter()
-            .all(|f| matches!(f.extension_type(), VariantType));
+            .all(|f| f.has_valid_extension_type::<VariantType>());
 
         ensure(
             all_variant_fields,

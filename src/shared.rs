@@ -5,7 +5,6 @@ use arrow::array::StructArray;
 use arrow::array::{Array, ArrayRef, cast::AsArray};
 #[cfg(test)]
 use arrow_schema::Fields;
-use arrow_schema::extension::ExtensionType;
 use arrow_schema::{DataType, Field};
 use datafusion::common::exec_datafusion_err;
 use datafusion::error::{DataFusionError, Result};
@@ -22,14 +21,9 @@ use parquet_variant_json::JsonToVariant;
 
 pub fn try_field_as_variant_array(field: &Field) -> Result<()> {
     ensure(
-        matches!(field.extension_type(), VariantType),
+        field.has_valid_extension_type::<VariantType>(),
         "field does not have extension type VariantType",
-    )?;
-
-    let variant_type = VariantType;
-    variant_type.supports_data_type(field.data_type())?;
-
-    Ok(())
+    )
 }
 
 pub fn _try_field_as_binary(field: &Field) -> Result<()> {

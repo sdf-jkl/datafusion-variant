@@ -409,7 +409,7 @@ mod tests {
             })
             .unwrap();
 
-        assert!(matches!(return_field.extension_type(), VariantType));
+        assert!(return_field.has_valid_extension_type::<VariantType>());
     }
 
     #[test]

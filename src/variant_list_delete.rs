@@ -109,7 +109,7 @@ impl ScalarUDFImpl for VariantListDelete {
         };
 
         ensure(
-            matches!(argument_fields[0].extension_type(), VariantType),
+            argument_fields[0].has_valid_extension_type::<VariantType>(),
             "expected extension type of VariantType for variant list argument",
         )?;
 

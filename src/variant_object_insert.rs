@@ -72,8 +72,8 @@ impl ScalarUDFImpl for VariantObjectInsert {
 
         {
             let variant_object_to_update_ext =
-                matches!(argument_fields[0].extension_type(), VariantType);
-            let value_ext = matches!(argument_fields[2].extension_type(), VariantType);
+                argument_fields[0].has_valid_extension_type::<VariantType>();
+            let value_ext = argument_fields[2].has_valid_extension_type::<VariantType>();
 
             ensure(
                 variant_object_to_update_ext && value_ext,
