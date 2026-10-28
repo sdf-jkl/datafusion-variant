@@ -5,4 +5,4 @@ FROM bluesky
 WHERE variant_get(data, 'kind', 'VARCHAR') = 'commit'
   AND variant_get(data, 'commit.operation', 'VARCHAR') = 'create'
 GROUP BY event
-ORDER BY count DESC, event ASC NULLS FIRST;
+ORDER BY count DESC;

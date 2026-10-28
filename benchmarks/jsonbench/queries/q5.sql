@@ -8,5 +8,5 @@ WHERE variant_get(data, 'kind', 'VARCHAR') = 'commit'
   AND variant_get(data, 'commit.operation', 'VARCHAR') = 'create'
   AND variant_get(data, 'commit.collection', 'VARCHAR') = 'app.bsky.feed.post'
 GROUP BY user_id
-ORDER BY activity_span DESC NULLS LAST, user_id ASC NULLS FIRST
+ORDER BY activity_span DESC NULLS LAST
 LIMIT 3;

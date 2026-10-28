@@ -118,7 +118,7 @@ async fn parquet_layouts_preserve_documents_and_all_five_query_results() -> Resu
                 let batch = batch?;
                 let array = VariantArray::try_new(batch.column(0).as_ref())?;
                 assert_eq!(
-                    array.typed_value_field().is_some(),
+                    array.typed_value_column().is_some(),
                     layout != Layout::Unshredded
                 );
                 let array = unshred_variant(&array)?;
@@ -132,8 +132,30 @@ async fn parquet_layouts_preserve_documents_and_all_five_query_results() -> Resu
         assert_eq!(documents, expected_documents);
         let ctx = context(&run_options(&options), &paths).await?;
         let mut results = Vec::new();
-        for sql in QUERIES {
-            results.push(rows(&ctx.sql(sql).await?.collect().await?)?);
+        for (query, sql) in QUERIES.iter().enumerate() {
+            let mut result = rows(&ctx.sql(sql).await?.collect().await?)?;
+            match query {
+                // Check the requested order, then normalize unspecified ties.
+                0 | 1 => {
+                    assert!(result.windows(2).all(|pair| {
+                        pair[0][1].as_ref().unwrap().parse::<u64>().unwrap()
+                            >= pair[1][1].as_ref().unwrap().parse::<u64>().unwrap()
+                    }));
+                    for tied in result.chunk_by_mut(|a, b| a[1] == b[1]) {
+                        tied.sort_by(|a, b| a[0].cmp(&b[0]));
+                    }
+                }
+                3 => {
+                    assert_eq!(result[0][0].as_deref(), Some("alice"));
+                    result[1..].sort_by(|a, b| a[0].cmp(&b[0]));
+                }
+                4 => {
+                    assert!(matches!(result[2][0].as_deref(), Some("eve" | "frank")));
+                    result[2][0] = Some("tied user".into());
+                }
+                _ => {}
+            }
+            results.push(result);
         }
         if references.is_empty() {
             references = results;
@@ -177,7 +199,7 @@ async fn parquet_layouts_preserve_documents_and_all_five_query_results() -> Resu
         vec![
             vec![text("alice"), text("1001")],
             vec![text("bob"), text("1")],
-            vec![text("eve"), text("0")]
+            vec![text("tied user"), text("0")]
         ]
     );
     Ok(())

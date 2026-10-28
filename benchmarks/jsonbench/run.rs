@@ -101,6 +101,8 @@ pub(super) async fn run(options: &Run) -> Result<()> {
     let mut report = Report {
         context: serde_json::json!({
             "benchmark_version": env!("CARGO_PKG_VERSION"),
+            "jsonbench_revision": "e6c7c98dc766394d51f7d506a3dd2b5d51165d70",
+            "cache_policy": "uncontrolled",
             "datafusion_version": datafusion::DATAFUSION_VERSION,
             "num_cpus": std::thread::available_parallelism()?.get(),
             "start_time": now()?,
@@ -123,7 +125,10 @@ pub(super) async fn run(options: &Run) -> Result<()> {
                 ctx.sql(sql).await?.explain(false, false)?.show().await?;
             }
             for iteration in 0..options.iterations {
-                // Same timing boundary as DataFusion's ClickBench runner.
+                // Like DataFusion's ClickBench runner: SQL planning through
+                // result collection, including Parquet reads. Preparation and
+                // registration are outside timing. No cache flush: iteration 0
+                // is not a controlled cold run; retain every sample.
                 let start = Instant::now();
                 let batches = ctx.sql(sql).await?.collect().await?;
                 let elapsed = start.elapsed().as_secs_f64() * 1000.0;

@@ -77,7 +77,7 @@ struct Run {
     /// Query IDs are 1 through 5. Omit to run all queries.
     #[arg(long, value_parser = clap::value_parser!(u8).range(1..=5))]
     query: Option<u8>,
-    #[arg(long, default_value_t = 5, value_parser = positive_usize)]
+    #[arg(long, default_value_t = 3, value_parser = positive_usize)]
     iterations: usize,
     #[arg(long, default_value_t = 4, value_parser = positive_usize)]
     partitions: usize,

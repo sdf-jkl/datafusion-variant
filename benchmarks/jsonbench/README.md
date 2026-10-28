@@ -41,16 +41,18 @@ cargo run --release --example jsonbench -- run --rows 10000 --iterations 1
 ```
 
 By default the runner requires all three layouts and executes all five queries,
-five iterations each. Use `--layout partial --query 3` to select a case.
+three iterations each. Use `--layout partial --query 3` to select a case.
 Other run options are `--partitions` (4), `--batch-size` (8192),
 `--memory-limit-mib` (1024), and `--debug` (show plans outside timing).
 UTC and Parquet extension metadata are enabled for the Variant queries.
 
 Timing follows DataFusion ClickBench: SQL planning through result collection,
 including Parquet reads. Preparation and table registration are outside timing.
-There is no explicit warmup; the OS may cache data between iterations.
+For JSONBench hot timings, take the minimum of iterations 2 and 3. There is no
+cache flush, so iteration 1 is not a controlled cold run.
 Results default to `data/jsonbench/results.json` and use DataFusion's comparison
-format (milliseconds and result row counts):
+format (milliseconds and result row counts), with the JSONBench revision and
+cache policy recorded:
 
 ```sh
 cargo run --release --example jsonbench -- run -o data/jsonbench/base.json
@@ -64,7 +66,8 @@ Query errors stop the run; output is written after all selected cases succeed.
 
 `cargo test --example jsonbench` checks document preservation, all five queries
 across the three layouts, and expected results.
-SQL uses `VARCHAR`/`BIGINT` extraction, UTC hours, and deterministic tie ordering.
+SQL uses `VARCHAR`/`BIGINT` extraction and UTC hours; ties follow the upstream
+queries without additional ordering.
 Q5 divides each positive epoch-microsecond endpoint by 1,000 before subtraction
 to match ClickHouse's millisecond-boundary `dateDiff` semantics.
 
