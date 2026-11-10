@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SQL function reference &#8212; DataFusion Variant  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=5ed1a2f5" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
+
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'sql-reference';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="prev" title="Variant shredding" href="shredding.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">DataFusion Variant  documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shredding.html">Variant shredding</a></li>
+<li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">SQL function reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Cookbook</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="cookbook/load-and-query-json.html">Load and query JSON</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook/store-and-read-parquet.html">Store and read Parquet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook/convert-sql-types.html">Convert to and from SQL types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook/common-pitfalls.html">Common pitfalls</a></li>
+</ul>
+
+  </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-house"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">SQL function reference</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <!-- Generated by cargo run --bin generate_function_docs. Do not edit directly. -->
+<section id="sql-function-reference">
+<h1>SQL function reference<a class="headerlink" href="#sql-function-reference" title="Link to this heading">#</a></h1>
+<p>Documented scalar and aggregate functions registered by <code class="docutils literal notranslate"><span class="pre">register_all</span></code>.
+See <a class="reference internal" href="getting-started.html"><span class="std std-doc">Getting started</span></a> for setup and the <a class="reference internal" href="cookbook/load-and-query-json.html"><span class="std std-doc">cookbook</span></a> for common workflows.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#is-valid-variant"><code class="docutils literal notranslate"><span class="pre">is_valid_variant(value)</span></code></a></p></td>
+<td><p>Validates a Variant value using Arrow validation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#is-variant-null"><code class="docutils literal notranslate"><span class="pre">is_variant_null(value)</span></code></a></p></td>
+<td><p>Returns true if the input is a present Variant null, and false otherwise, including SQL NULL and missing fields.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#parse-json"><code class="docutils literal notranslate"><span class="pre">parse_json(json)</span></code></a></p></td>
+<td><p>Parses a JSON string into a Variant value.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#schema-of-variant"><code class="docutils literal notranslate"><span class="pre">schema_of_variant(value)</span></code></a></p></td>
+<td><p>Returns a SQL schema string for a Variant value.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#schema-of-variant-agg"><code class="docutils literal notranslate"><span class="pre">schema_of_variant_agg(value)</span></code></a></p></td>
+<td><p>Returns a SQL schema string by merging the schemas of Variant values across rows.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#to-json"><code class="docutils literal notranslate"><span class="pre">to_json(value[,</span> <span class="pre">options])</span></code></a></p></td>
+<td><p>Serializes a Variant value to a JSON string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#to-variant-object"><code class="docutils literal notranslate"><span class="pre">to_variant_object(expression)</span></code></a></p></td>
+<td><p>Converts an array, struct, or string-keyed map to VARIANT.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#try-parse-json"><code class="docutils literal notranslate"><span class="pre">try_parse_json(json)</span></code></a></p></td>
+<td><p>Parses a JSON string into a Variant value, returning SQL NULL for invalid JSON.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#try-variant-get"><code class="docutils literal notranslate"><span class="pre">try_variant_get(value,</span> <span class="pre">path[,</span> <span class="pre">type])</span></code></a></p></td>
+<td><p>Extracts the value at a path and optionally converts it to a SQL type, returning SQL NULL when the result-type conversion fails.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#variant-delete"><code class="docutils literal notranslate"><span class="pre">variant_delete(v,</span> <span class="pre">path1[,</span> <span class="pre">path2,</span> <span class="pre">...])</span></code></a></p></td>
+<td><p>Deletes object fields or array elements at one or more JSONPaths, applied left to right.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#variant-get"><code class="docutils literal notranslate"><span class="pre">variant_get(value,</span> <span class="pre">path[,</span> <span class="pre">type])</span></code></a></p></td>
+<td><p>Extracts the value at a path and optionally converts it to a SQL type.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="is-valid-variant">
+<h2><code class="docutils literal notranslate"><span class="pre">is_valid_variant</span></code><a class="headerlink" href="#is-valid-variant" title="Link to this heading">#</a></h2>
+<p>Validates a Variant value using Arrow validation. Returns false for malformed bytes. SQL
+NULL stays SQL NULL; Variant null is valid.</p>
+<p>Invalid storage schemas and unsupported reconstruction raise errors. Arrow validation is
+stricter than Spark for metadata, UTF-8, object keys, offsets, nesting, and date/time
+ranges. Malformed shredded metadata can still panic in Arrow; see
+<a class="reference external" href="https://github.com/apache/arrow-rs/issues/11069">#11069</a>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">is_valid_variant(value)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Arguments</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">value</span></code>: Variant expression to validate.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Example</strong></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">is_valid_variant</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'null'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">valid</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">-------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">valid</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">  </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-------+</span>
+</pre></div>
+</div>
+</section>
+<section id="is-variant-null">
+<h2><code class="docutils literal notranslate"><span class="pre">is_variant_null</span></code><a class="headerlink" href="#is-variant-null" title="Link to this heading">#</a></h2>
+<p>Returns true if the input is a present Variant null, and false otherwise,
+including SQL NULL and missing fields. The result is a non-null BOOLEAN.
+Checks only the top-level value; nulls inside objects or arrays do not make the
+container null. This predicate does not validate the full Variant contents.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">is_variant_null(value)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Arguments</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">value</span></code>: Variant expression or an untyped SQL NULL.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Related</strong></p></td>
+<td><p><a class="reference internal" href="#variant-get"><code class="docutils literal notranslate"><span class="pre">variant_get</span></code></a>, <a class="reference internal" href="#parse-json"><code class="docutils literal notranslate"><span class="pre">parse_json</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Example</strong></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">is_variant_null</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'null'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">variant_null</span><span class="p">,</span><span class="w"> </span><span class="n">is_variant_null</span><span class="p">(</span><span class="k">NULL</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">sql_null</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">--------------+----------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">variant_null</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">sql_null</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">--------------+----------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">         </span><span class="o">|</span><span class="w"> </span><span class="k">false</span><span class="w">    </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">--------------+----------+</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">is_variant_null</span><span class="p">(</span><span class="n">variant_get</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{"a":null}'</span><span class="p">),</span><span class="w"> </span><span class="s1">'a'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">present</span><span class="p">,</span><span class="w"> </span><span class="n">is_variant_null</span><span class="p">(</span><span class="n">variant_get</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{"a":null}'</span><span class="p">),</span><span class="w"> </span><span class="s1">'b'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">missing</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">---------+---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">present</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">missing</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="k">false</span><span class="w">   </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+---------+</span>
+</pre></div>
+</div>
+</section>
+<section id="parse-json">
+<h2><code class="docutils literal notranslate"><span class="pre">parse_json</span></code><a class="headerlink" href="#parse-json" title="Link to this heading">#</a></h2>
+<p>Parses a JSON string into a Variant value. Invalid JSON raises an error.
+SQL NULL returns SQL NULL; the JSON text <code class="docutils literal notranslate"><span class="pre">null</span></code> produces a present Variant null.</p>
+<p>Uses Arrow's JSON parser. Fractional JSON numbers become DOUBLE; decimal precision
+and duplicate-key handling have known differences from Spark (see <a class="reference external" href="https://github.com/datafusion-contrib/datafusion-variant/issues/71">#71</a>).</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">parse_json(json)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Arguments</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">json</span></code>: String expression containing a JSON value.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Related</strong></p></td>
+<td><p><a class="reference internal" href="#try-parse-json"><code class="docutils literal notranslate"><span class="pre">try_parse_json</span></code></a>, <a class="reference internal" href="#to-json"><code class="docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Example</strong></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">to_json</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{"a":1}'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">json</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">json</span><span class="w">    </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="err">{</span><span class="ss">"a"</span><span class="p">:</span><span class="mi">1</span><span class="err">}</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">parse_json</span><span class="p">(</span><span class="k">NULL</span><span class="p">)</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">sql_null</span><span class="p">,</span><span class="w"> </span><span class="n">is_variant_null</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'null'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">variant_null</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">----------+--------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">sql_null</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">variant_null</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">----------+--------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">         </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">----------+--------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="schema-of-variant">
+<h2><code class="docutils literal notranslate"><span class="pre">schema_of_variant</span></code><a class="headerlink" href="#schema-of-variant" title="Link to this heading">#</a></h2>
+<p>Returns a SQL schema string for a Variant value. SQL NULL returns SQL NULL;
+Variant null has schema <code class="docutils literal notranslate"><span class="pre">VOID</span></code>. Object fields are sorted by name. Array element
+schemas are merged, widening compatible types and using <code class="docutils literal notranslate"><span class="pre">VARIANT</span></code> for incompatible types.</p>
+<p>Fractional numbers parsed by <code class="docutils literal notranslate"><span class="pre">parse_json</span></code> have schema <code class="docutils literal notranslate"><span class="pre">DOUBLE</span></code>, unlike Spark's
+decimal inference. Use <code class="docutils literal notranslate"><span class="pre">CAST(decimal_value</span> <span class="pre">AS</span> <span class="pre">VARIANT)</span></code> to preserve decimal types.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">schema_of_variant(value)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Arguments</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">value</span></code>: Variant expression whose schema is inferred, or an untyped SQL NULL.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Example</strong></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">schema_of_variant</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'null'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">schema</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">--------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">schema</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">--------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">VOID</span><span class="w">   </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">--------+</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">schema_of_variant</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'[{"b":true,"a":0}]'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">schema</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">--------------------------------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">schema</span><span class="w">                               </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">--------------------------------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="nb">ARRAY</span><span class="o">&lt;</span><span class="k">OBJECT</span><span class="o">&lt;</span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="nb">BIGINT</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">--------------------------------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="schema-of-variant-agg">
+<h2><code class="docutils literal notranslate"><span class="pre">schema_of_variant_agg</span></code><a class="headerlink" href="#schema-of-variant-agg" title="Link to this heading">#</a></h2>
+<p>Returns a SQL schema string by merging the schemas of Variant values across rows.
+SQL NULL values are ignored. Empty input, all-SQL-NULL input, and all-Variant-null
+input return <code class="docutils literal notranslate"><span class="pre">VOID</span></code>. Compatible types are widened; incompatible types become <code class="docutils literal notranslate"><span class="pre">VARIANT</span></code>.
+Object fields are merged by name and sorted in the output. Array element schemas
+are merged using the same rules.</p>
+<p>Fractional numbers parsed by <code class="docutils literal notranslate"><span class="pre">parse_json</span></code> contribute <code class="docutils literal notranslate"><span class="pre">DOUBLE</span></code>, unlike Spark's
+decimal inference. Use <code class="docutils literal notranslate"><span class="pre">CAST(decimal_value</span> <span class="pre">AS</span> <span class="pre">VARIANT)</span></code> to preserve decimal types.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">schema_of_variant_agg(value)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Arguments</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">value</span></code>: Variant expression to aggregate, or an untyped SQL NULL.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Example</strong></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">schema_of_variant_agg</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="n">j</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">schema</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'1'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s1">'2'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s1">'3'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">t</span><span class="p">(</span><span class="n">j</span><span class="p">);</span>
+<span class="o">+</span><span class="c1">--------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">schema</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">--------+</span>
+<span class="o">|</span><span class="w"> </span><span class="nb">BIGINT</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">--------+</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">schema_of_variant_agg</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="n">j</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">schema</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'{"a":1}'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s1">'{"b":true}'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s1">'{"c":1.23}'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">t</span><span class="p">(</span><span class="n">j</span><span class="p">);</span>
+<span class="o">+</span><span class="c1">------------------------------------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">schema</span><span class="w">                                   </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">------------------------------------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">OBJECT</span><span class="o">&lt;</span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="nb">BIGINT</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="p">,</span><span class="w"> </span><span class="k">c</span><span class="p">:</span><span class="w"> </span><span class="n">DOUBLE</span><span class="o">&gt;</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">------------------------------------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="to-json">
+<h2><code class="docutils literal notranslate"><span class="pre">to_json</span></code><a class="headerlink" href="#to-json" title="Link to this heading">#</a></h2>
+<p>Serializes a Variant value to a JSON string. SQL NULL returns SQL NULL;
+Variant null becomes the string <code class="docutils literal notranslate"><span class="pre">null</span></code>. Strings retain their JSON quotes.
+This function accepts Variant values only. The optional second argument is currently
+ignored; serialization options are not implemented.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">to_json(value[,</span> <span class="pre">options])</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Arguments</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">value</span></code>: Variant expression to serialize.<br><code class="docutils literal notranslate"><span class="pre">options</span></code>: Optional argument, currently ignored.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Related</strong></p></td>
+<td><p><a class="reference internal" href="#parse-json"><code class="docutils literal notranslate"><span class="pre">parse_json</span></code></a>, <a class="reference internal" href="#try-parse-json"><code class="docutils literal notranslate"><span class="pre">try_parse_json</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Example</strong></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">to_json</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'"hello"'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">json</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">json</span><span class="w">    </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="ss">"hello"</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">to_json</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'null'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">to_json</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="k">NULL</span><span class="p">))</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">sql_null</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">------+----------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">sql_null</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">------+----------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">     </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">------+----------+</span>
+</pre></div>
+</div>
+</section>
+<section id="to-variant-object">
+<h2><code class="docutils literal notranslate"><span class="pre">to_variant_object</span></code><a class="headerlink" href="#to-variant-object" title="Link to this heading">#</a></h2>
+<p>Converts an array, struct, or string-keyed map to VARIANT. Structs and maps become unordered objects. SQL NULL inputs remain SQL NULL; null array elements become Variant null.</p>
+<p>Unlike Spark, null object fields are currently omitted and duplicate object keys are not rejected. Nested VARIANT inputs are not supported.</p>
+<p>Use CAST(value AS VARIANT) for scalar inputs.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">to_variant_object(expression)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Arguments</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">expression</span></code>: An array, struct, or map. Map keys must be strings, including in nested maps.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Related</strong></p></td>
+<td><p><a class="reference internal" href="#parse-json"><code class="docutils literal notranslate"><span class="pre">parse_json</span></code></a>, <a class="reference internal" href="#to-json"><code class="docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Example</strong></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">to_json</span><span class="p">(</span><span class="n">to_variant_object</span><span class="p">(</span><span class="n">named_struct</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">json</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">json</span><span class="w">    </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="err">{</span><span class="ss">"a"</span><span class="p">:</span><span class="mi">1</span><span class="err">}</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+</span>
+</pre></div>
+</div>
+</section>
+<section id="try-parse-json">
+<h2><code class="docutils literal notranslate"><span class="pre">try_parse_json</span></code><a class="headerlink" href="#try-parse-json" title="Link to this heading">#</a></h2>
+<p>Parses a JSON string into a Variant value, returning SQL NULL for invalid JSON.
+In a column, a malformed value produces NULL for that row. SQL NULL returns SQL NULL;
+the JSON text <code class="docutils literal notranslate"><span class="pre">null</span></code> produces a present Variant null. Invalid argument types or counts
+still raise errors. Shares the parser limitations of <code class="docutils literal notranslate"><span class="pre">parse_json</span></code>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">try_parse_json(json)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Arguments</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">json</span></code>: String expression containing a JSON value.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Related</strong></p></td>
+<td><p><a class="reference internal" href="#parse-json"><code class="docutils literal notranslate"><span class="pre">parse_json</span></code></a>, <a class="reference internal" href="#to-json"><code class="docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Example</strong></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">to_json</span><span class="p">(</span><span class="n">try_parse_json</span><span class="p">(</span><span class="s1">'{"a":1}'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">json</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">json</span><span class="w">    </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="err">{</span><span class="ss">"a"</span><span class="p">:</span><span class="mi">1</span><span class="err">}</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">try_parse_json</span><span class="p">(</span><span class="s1">'{'</span><span class="p">)</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">invalid_json</span><span class="p">,</span><span class="w"> </span><span class="n">is_variant_null</span><span class="p">(</span><span class="n">try_parse_json</span><span class="p">(</span><span class="s1">'null'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">variant_null</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">--------------+--------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">invalid_json</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">variant_null</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">--------------+--------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">         </span><span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">         </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">--------------+--------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="try-variant-get">
+<h2><code class="docutils literal notranslate"><span class="pre">try_variant_get</span></code><a class="headerlink" href="#try-variant-get" title="Link to this heading">#</a></h2>
+<p>Extracts the value at a path and optionally converts it to a SQL type,
+returning SQL NULL when the result-type conversion fails. Uses the same paths, type
+hints, and null handling as <code class="docutils literal notranslate"><span class="pre">variant_get</span></code>. Without a type hint, returns Variant.
+Invalid paths and invalid type hints still raise errors.</p>
+<p>Register with <code class="docutils literal notranslate"><span class="pre">register_variant_get_functions</span></code> to enable <code class="docutils literal notranslate"><span class="pre">TRY_CAST</span></code> of getters.
+Also register <code class="docutils literal notranslate"><span class="pre">VariantExprPlanner</span></code> for <code class="docutils literal notranslate"><span class="pre">:</span></code> field access. <code class="docutils literal notranslate"><span class="pre">TRY_CAST</span></code> of an untyped
+getter or colon access uses the same conversion policy as <code class="docutils literal notranslate"><span class="pre">try_variant_get</span></code>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">try_variant_get(value,</span> <span class="pre">path[,</span> <span class="pre">type])</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Alternative syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">TRY_CAST(variant_get(value,</span> <span class="pre">path)</span> <span class="pre">AS</span> <span class="pre">type)</span></code><br><code class="docutils literal notranslate"><span class="pre">TRY_CAST(value:field</span> <span class="pre">AS</span> <span class="pre">type)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Arguments</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">value</span></code>: Variant expression to extract from.<br><code class="docutils literal notranslate"><span class="pre">path</span></code>: String expression using the path syntax described for <code class="docutils literal notranslate"><span class="pre">variant_get</span></code>.<br><code class="docutils literal notranslate"><span class="pre">type</span></code>: Optional non-null SQL type string literal. Defaults to <code class="docutils literal notranslate"><span class="pre">VARIANT</span></code>; accepts the same types as <code class="docutils literal notranslate"><span class="pre">variant_get</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Related</strong></p></td>
+<td><p><a class="reference internal" href="#variant-get"><code class="docutils literal notranslate"><span class="pre">variant_get</span></code></a>, <a class="reference internal" href="#is-variant-null"><code class="docutils literal notranslate"><span class="pre">is_variant_null</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Example</strong></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">try_variant_get</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{"a":1}'</span><span class="p">),</span><span class="w"> </span><span class="s1">'a'</span><span class="p">,</span><span class="w"> </span><span class="s1">'BIGINT'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">-------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-------+</span>
+<span class="o">|</span><span class="w"> </span><span class="mi">1</span><span class="w">     </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-------+</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">try_variant_get</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'[1,"hello"]'</span><span class="p">),</span><span class="w"> </span><span class="s1">'[1]'</span><span class="p">,</span><span class="w"> </span><span class="s1">'BIGINT'</span><span class="p">)</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">failed_cast</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">-------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">failed_cast</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">        </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-------------+</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="k">input</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{"price":"invalid"}'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">v</span><span class="p">)</span>
+<span class="w">  </span><span class="k">SELECT</span><span class="w"> </span><span class="n">try_variant_get</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="s1">'price'</span><span class="p">,</span><span class="w"> </span><span class="s1">'DECIMAL(12,2)'</span><span class="p">)</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">type_hint</span><span class="p">,</span>
+<span class="w">         </span><span class="n">TRY_CAST</span><span class="p">(</span><span class="n">variant_get</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="s1">'price'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">sql_cast</span><span class="p">,</span>
+<span class="w">         </span><span class="n">TRY_CAST</span><span class="p">(</span><span class="n">v</span><span class="p">:</span><span class="n">price</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">colon_cast</span>
+<span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="k">input</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">-----------+----------+------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">type_hint</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">sql_cast</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">colon_cast</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-----------+----------+------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">       </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-----------+----------+------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="variant-delete">
+<h2><code class="docutils literal notranslate"><span class="pre">variant_delete</span></code><a class="headerlink" href="#variant-delete" title="Link to this heading">#</a></h2>
+<p>Deletes object fields or array elements at one or more JSONPaths, applied left to right. Missing targets and type mismatches leave the value unchanged. SQL NULL input returns SQL NULL; NULL paths are skipped. Paths must start with <code class="docutils literal notranslate"><span class="pre">$</span></code> and cannot select the root alone.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">variant_delete(v,</span> <span class="pre">path1[,</span> <span class="pre">path2,</span> <span class="pre">...])</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Arguments</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">v</span></code>: Variant expression to update.<br><code class="docutils literal notranslate"><span class="pre">path</span></code>: String expression identifying a field or array element.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Example</strong></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">variant_delete</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{"a":[1,2,3]}'</span><span class="p">),</span><span class="w"> </span><span class="s1">'$.a[0]'</span><span class="p">,</span><span class="w"> </span><span class="s1">'$.a[0]'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">v</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">-----------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">v</span><span class="w">         </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-----------+</span>
+<span class="o">|</span><span class="w"> </span><span class="err">{</span><span class="ss">"a"</span><span class="p">:[</span><span class="mi">3</span><span class="p">]</span><span class="err">}</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-----------+</span>
+</pre></div>
+</div>
+</section>
+<section id="variant-get">
+<h2><code class="docutils literal notranslate"><span class="pre">variant_get</span></code><a class="headerlink" href="#variant-get" title="Link to this heading">#</a></h2>
+<p>Extracts the value at a path and optionally converts it to a SQL type.
+Without a type hint, returns Variant. SQL NULL input and missing paths return SQL NULL.
+Variant null remains a Variant null for Variant output and becomes SQL NULL for typed output.
+Invalid paths, invalid type hints, and failed conversions raise errors.</p>
+<p>Type names follow DataFusion SQL semantics, including session settings. For example,
+<code class="docutils literal notranslate"><span class="pre">INT8</span></code> means BIGINT; Arrow type names such as <code class="docutils literal notranslate"><span class="pre">Int64</span></code> are not accepted.
+Nested Variant target types are not supported.</p>
+<p>Register with <code class="docutils literal notranslate"><span class="pre">register_variant_get_functions</span></code> to enable SQL casts of getters.
+Also register <code class="docutils literal notranslate"><span class="pre">VariantExprPlanner</span></code> for <code class="docutils literal notranslate"><span class="pre">:</span></code> field access. A cast of an untyped
+getter or colon access performs the same conversion as an explicit type hint.
+Casts of already typed getters retain the intermediate conversion. The registration
+helper follows session type settings, including <code class="docutils literal notranslate"><span class="pre">SET</span></code> / <code class="docutils literal notranslate"><span class="pre">RESET</span></code>. Use <code class="docutils literal notranslate"><span class="pre">VARIANT</span></code> as the
+type hint or cast target to retain a Variant result.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">variant_get(value,</span> <span class="pre">path[,</span> <span class="pre">type])</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Alternative syntax</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CAST(variant_get(value,</span> <span class="pre">path)</span> <span class="pre">AS</span> <span class="pre">type)</span></code><br><code class="docutils literal notranslate"><span class="pre">value:field</span></code><br><code class="docutils literal notranslate"><span class="pre">value:field::type</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Arguments</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">value</span></code>: Variant expression to extract from.<br><code class="docutils literal notranslate"><span class="pre">path</span></code>: String expression such as <code class="docutils literal notranslate"><span class="pre">$.a.b[0]</span></code> or <code class="docutils literal notranslate"><span class="pre">a.b[0]</span></code>. <code class="docutils literal notranslate"><span class="pre">$</span></code>, an empty string, or SQL NULL selects the root. Use <code class="docutils literal notranslate"><span class="pre">$[&quot;a.b&quot;]</span></code> and <code class="docutils literal notranslate"><span class="pre">$[&quot;$name&quot;]</span></code> for literal field names. Rooted quoted keys preserve backslashes (Spark 4.2); rootless paths use Arrow escaping.<br><code class="docutils literal notranslate"><span class="pre">type</span></code>: Optional non-null SQL type string literal, such as <code class="docutils literal notranslate"><span class="pre">BIGINT</span></code>, <code class="docutils literal notranslate"><span class="pre">DECIMAL(12,2)</span></code>, or <code class="docutils literal notranslate"><span class="pre">ARRAY&lt;INT&gt;</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">VARIANT</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Related</strong></p></td>
+<td><p><a class="reference internal" href="#try-variant-get"><code class="docutils literal notranslate"><span class="pre">try_variant_get</span></code></a>, <a class="reference internal" href="#is-variant-null"><code class="docutils literal notranslate"><span class="pre">is_variant_null</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Example</strong></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">variant_get</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{"a":1}'</span><span class="p">),</span><span class="w"> </span><span class="s1">'a'</span><span class="p">,</span><span class="w"> </span><span class="s1">'BIGINT'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">-------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-------+</span>
+<span class="o">|</span><span class="w"> </span><span class="mi">1</span><span class="w">     </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-------+</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">variant_get</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{"a":1}'</span><span class="p">),</span><span class="w"> </span><span class="s1">'b'</span><span class="p">,</span><span class="w"> </span><span class="s1">'BIGINT'</span><span class="p">)</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">missing</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">missing</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="k">true</span><span class="w">    </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">to_json</span><span class="p">(</span><span class="n">variant_get</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'[1,"hello"]'</span><span class="p">),</span><span class="w"> </span><span class="s1">'[1]'</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">json</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">json</span><span class="w">    </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">|</span><span class="w"> </span><span class="ss">"hello"</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">---------+</span>
+<span class="o">&gt;</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="k">input</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{"price":12.5}'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">v</span><span class="p">)</span>
+<span class="w">  </span><span class="k">SELECT</span><span class="w"> </span><span class="n">variant_get</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="s1">'price'</span><span class="p">,</span><span class="w"> </span><span class="s1">'DECIMAL(12,2)'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">type_hint</span><span class="p">,</span>
+<span class="w">         </span><span class="k">CAST</span><span class="p">(</span><span class="n">variant_get</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="s1">'price'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">sql_cast</span><span class="p">,</span>
+<span class="w">         </span><span class="n">v</span><span class="p">:</span><span class="n">price</span><span class="p">::</span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">colon_cast</span>
+<span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="k">input</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">-----------+----------+------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="n">type_hint</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">sql_cast</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">colon_cast</span><span class="w"> </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-----------+----------+------------+</span>
+<span class="o">|</span><span class="w"> </span><span class="mi">12</span><span class="p">.</span><span class="mi">50</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="mi">12</span><span class="p">.</span><span class="mi">50</span><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="mi">12</span><span class="p">.</span><span class="mi">50</span><span class="w">      </span><span class="o">|</span>
+<span class="o">+</span><span class="c1">-----------+----------+------------+</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="shredding.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Variant shredding</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="contributing.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Contributing</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
