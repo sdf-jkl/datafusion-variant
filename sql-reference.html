@@ -45,7 +45,7 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="next" title="Benchmarks" href="benchmarks.html" />
     <link rel="prev" title="Variant shredding" href="shredding.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
@@ -221,8 +221,10 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paths.html">Variant paths</a></li>
 <li class="toctree-l1"><a class="reference internal" href="shredding.html">Variant shredding</a></li>
 <li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">SQL function reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Cookbook</span></p>
@@ -672,7 +674,7 @@ getter or colon access uses the same conversion policy as <code class="docutils 
 <td><p><code class="docutils literal notranslate"><span class="pre">TRY_CAST(variant_get(value,</span> <span class="pre">path)</span> <span class="pre">AS</span> <span class="pre">type)</span></code><br><code class="docutils literal notranslate"><span class="pre">TRY_CAST(value:field</span> <span class="pre">AS</span> <span class="pre">type)</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p><strong>Arguments</strong></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">value</span></code>: Variant expression to extract from.<br><code class="docutils literal notranslate"><span class="pre">path</span></code>: String expression using the path syntax described for <code class="docutils literal notranslate"><span class="pre">variant_get</span></code>.<br><code class="docutils literal notranslate"><span class="pre">type</span></code>: Optional non-null SQL type string literal. Defaults to <code class="docutils literal notranslate"><span class="pre">VARIANT</span></code>; accepts the same types as <code class="docutils literal notranslate"><span class="pre">variant_get</span></code>.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">value</span></code>: Variant expression to extract from.<br><code class="docutils literal notranslate"><span class="pre">path</span></code>: String expression such as <code class="docutils literal notranslate"><span class="pre">$.a.b[0]</span></code>. See <a class="reference internal" href="paths.html"><span class="std std-doc">Variant paths</span></a>.<br><code class="docutils literal notranslate"><span class="pre">type</span></code>: Optional non-null SQL type string literal. Defaults to <code class="docutils literal notranslate"><span class="pre">VARIANT</span></code>; accepts the same types as <code class="docutils literal notranslate"><span class="pre">variant_get</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>Related</strong></p></td>
 <td><p><a class="reference internal" href="#variant-get"><code class="docutils literal notranslate"><span class="pre">variant_get</span></code></a>, <a class="reference internal" href="#is-variant-null"><code class="docutils literal notranslate"><span class="pre">is_variant_null</span></code></a></p></td>
@@ -720,7 +722,7 @@ getter or colon access uses the same conversion policy as <code class="docutils 
 <td><p><code class="docutils literal notranslate"><span class="pre">variant_delete(v,</span> <span class="pre">path1[,</span> <span class="pre">path2,</span> <span class="pre">...])</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>Arguments</strong></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">v</span></code>: Variant expression to update.<br><code class="docutils literal notranslate"><span class="pre">path</span></code>: String expression identifying a field or array element.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">v</span></code>: Variant expression to update.<br><code class="docutils literal notranslate"><span class="pre">path</span></code>: String expression identifying a field or array element. See <a class="reference internal" href="paths.html"><span class="std std-doc">Variant paths</span></a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -764,7 +766,7 @@ type hint or cast target to retain a Variant result.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">CAST(variant_get(value,</span> <span class="pre">path)</span> <span class="pre">AS</span> <span class="pre">type)</span></code><br><code class="docutils literal notranslate"><span class="pre">value:field</span></code><br><code class="docutils literal notranslate"><span class="pre">value:field::type</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p><strong>Arguments</strong></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">value</span></code>: Variant expression to extract from.<br><code class="docutils literal notranslate"><span class="pre">path</span></code>: String expression such as <code class="docutils literal notranslate"><span class="pre">$.a.b[0]</span></code> or <code class="docutils literal notranslate"><span class="pre">a.b[0]</span></code>. <code class="docutils literal notranslate"><span class="pre">$</span></code>, an empty string, or SQL NULL selects the root. Use <code class="docutils literal notranslate"><span class="pre">$[&quot;a.b&quot;]</span></code> and <code class="docutils literal notranslate"><span class="pre">$[&quot;$name&quot;]</span></code> for literal field names. Rooted quoted keys preserve backslashes (Spark 4.2); rootless paths use Arrow escaping.<br><code class="docutils literal notranslate"><span class="pre">type</span></code>: Optional non-null SQL type string literal, such as <code class="docutils literal notranslate"><span class="pre">BIGINT</span></code>, <code class="docutils literal notranslate"><span class="pre">DECIMAL(12,2)</span></code>, or <code class="docutils literal notranslate"><span class="pre">ARRAY&lt;INT&gt;</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">VARIANT</span></code>.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">value</span></code>: Variant expression to extract from.<br><code class="docutils literal notranslate"><span class="pre">path</span></code>: String expression such as <code class="docutils literal notranslate"><span class="pre">$.a.b[0]</span></code>. SQL NULL selects the root. See <a class="reference internal" href="paths.html"><span class="std std-doc">Variant paths</span></a>.<br><code class="docutils literal notranslate"><span class="pre">type</span></code>: Optional non-null SQL type string literal, such as <code class="docutils literal notranslate"><span class="pre">BIGINT</span></code>, <code class="docutils literal notranslate"><span class="pre">DECIMAL(12,2)</span></code>, or <code class="docutils literal notranslate"><span class="pre">ARRAY&lt;INT&gt;</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">VARIANT</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>Related</strong></p></td>
 <td><p><a class="reference internal" href="#try-variant-get"><code class="docutils literal notranslate"><span class="pre">try_variant_get</span></code></a>, <a class="reference internal" href="#is-variant-null"><code class="docutils literal notranslate"><span class="pre">is_variant_null</span></code></a></p></td>
@@ -826,11 +828,11 @@ type hint or cast target to retain a Variant result.</p>
       </div>
     </a>
     <a class="right-next"
-       href="contributing.html"
+       href="benchmarks.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Contributing</p>
+        <p class="prev-next-title">Benchmarks</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

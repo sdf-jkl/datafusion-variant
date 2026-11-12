@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="SQL function reference" href="sql-reference.html" />
-    <link rel="prev" title="Getting started" href="getting-started.html" />
+    <link rel="prev" title="Variant paths" href="paths.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
@@ -221,8 +221,10 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paths.html">Variant paths</a></li>
 <li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">Variant shredding</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sql-reference.html">SQL function reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Cookbook</span></p>
@@ -292,7 +294,7 @@
   <section id="variant-shredding">
 <h1>Variant shredding<a class="headerlink" href="#variant-shredding" title="Link to this heading">#</a></h1>
 <p>The standard Variant binary encoding is efficient and compact, but it must still
-be read and decoded for every query. The <a class="reference external" href="https://parquet.apache.org/docs/file-format/types/variantshredding/">Parquet Variant shredding
+read and decode each value for every query. The <a class="reference external" href="https://parquet.apache.org/docs/file-format/types/variantshredding/">Parquet Variant shredding
 specification</a> describes an optional on-disk layout
 for Variant columns that stores some fields in typed Parquet columns. Queries on
 the shredded fields read the typed columns directly, which is significantly
@@ -484,6 +486,66 @@ FROM 'shredded_objects.parquet';
 </pre></div>
 </div>
 </section>
+<section id="files-with-different-shredding-layouts">
+<h2>Files with different shredding layouts<a class="headerlink" href="#files-with-different-shredding-layouts" title="Link to this heading">#</a></h2>
+<p>It is also possible to read files with different shredding layouts as a single
+table, which is often referred to as schema evolution. This can happen when the
+optimal shredding evolves over time, or different producers shred the same data
+differently. DataFusion transparently unifies the different shredding layouts
+into a single table.</p>
+<p>For example, if you write <code class="docutils literal notranslate"><span class="pre">file1.parquet</span></code> with the <code class="docutils literal notranslate"><span class="pre">id</span></code> and <code class="docutils literal notranslate"><span class="pre">status</span></code> fields
+shredded, and <code class="docutils literal notranslate"><span class="pre">file2.parquet</span></code> with just the <code class="docutils literal notranslate"><span class="pre">id</span></code> field shredded:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- file1.parquet: shredded on id and status</span>
+<span class="k">COPY</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="k">SELECT</span><span class="w"> </span><span class="n">parse_json</span><span class="p">(</span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">event</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="k">VALUES</span>
+<span class="w">      </span><span class="p">(</span><span class="s1">'{"id": 5, "service":"api", "status":200}'</span><span class="p">),</span>
+<span class="w">      </span><span class="p">(</span><span class="s1">'{"id": 6, "service":"api", "status":500}'</span><span class="p">),</span>
+<span class="w">      </span><span class="p">(</span><span class="s1">'{"id": 7, "service":"web", "status":504}'</span><span class="p">)</span>
+<span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">input</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="s1">'mixed_events/file1.parquet'</span><span class="w"> </span><span class="n">STORED</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">PARQUET</span>
+<span class="k">OPTIONS</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="s1">'variant.shredding'</span>
+<span class="w">  </span><span class="s1">'{"event": "STRUCT&lt;id BIGINT, status BIGINT&gt;"}'</span><span class="w"> </span><span class="c1">-- shred id and status</span>
+<span class="p">);</span>
+
+<span class="c1">-- file2.parquet: shredded on id</span>
+<span class="k">COPY</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="k">SELECT</span><span class="w"> </span><span class="n">parse_json</span><span class="p">(</span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">event</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="k">VALUES</span>
+<span class="w">      </span><span class="p">(</span><span class="s1">'{"id": 8, "service":"api", "status":200}'</span><span class="p">),</span>
+<span class="w">      </span><span class="p">(</span><span class="s1">'{"id": 9, "service":"db", "status":503}'</span><span class="p">)</span>
+<span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">input</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="s1">'mixed_events/file2.parquet'</span><span class="w"> </span><span class="n">STORED</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">PARQUET</span>
+<span class="k">OPTIONS</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="s1">'variant.shredding'</span>
+<span class="w">  </span><span class="s1">'{"event": "STRUCT&lt;id BIGINT&gt;"}'</span><span class="w"> </span><span class="c1">-- shred id</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>Create a table over the directory, and DataFusion reads <code class="docutils literal notranslate"><span class="pre">event</span></code> from both files
+as a single column:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">EXTERNAL</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">mixed_events</span><span class="w"> </span><span class="n">STORED</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">PARQUET</span><span class="w"> </span><span class="k">LOCATION</span><span class="w"> </span><span class="s1">'mixed_events/'</span><span class="p">;</span>
+
+<span class="k">SELECT</span><span class="w"> </span><span class="n">event</span><span class="p">:</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">event</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">mixed_events</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">event</span><span class="p">:</span><span class="n">id</span><span class="p">::</span><span class="nb">BIGINT</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+-----------------------+---------------------------------------+
+| mixed_events.event:id | event                                 |
++-----------------------+---------------------------------------+
+| 5                     | {"id":5,"service":"api","status":200} |
+| 6                     | {"id":6,"service":"api","status":500} |
+| 7                     | {"id":7,"service":"web","status":504} |
+| 8                     | {"id":8,"service":"api","status":200} |
+| 9                     | {"id":9,"service":"db","status":503}  |
++-----------------------+---------------------------------------+
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">EXTERNAL</span> <span class="pre">TABLE</span></code> for such directories. Reading the directory directly
+with <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">...</span> <span class="pre">FROM</span> <span class="pre">'mixed_events/'</span></code> does not unify the layouts yet and
+returns an error or NULL for the fields that are shredded differently
+(<a class="reference external" href="https://github.com/apache/datafusion/issues/27089">apache/datafusion#27089</a>).</p>
+<p>See the documentation on <a class="reference download internal" download="" href="_downloads/0b80f101b8a3adc4d32cfe63e72b3278/expr_adapter.rs"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">VariantExprAdapterFactory</span></code></span></a>
+for more details.</p>
+</section>
 <section id="supported-types">
 <h2>Supported types<a class="headerlink" href="#supported-types" title="Link to this heading">#</a></h2>
 <p>You can use any SQL type supported by DataFusion and listed in the <a class="reference external" href="https://parquet.apache.org/docs/file-format/types/variantshredding/">shredding
@@ -576,12 +638,12 @@ run <code class="docutils literal notranslate"><span class="pre">SET</span> <spa
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="getting-started.html"
+       href="paths.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Getting started</p>
+        <p class="prev-next-title">Variant paths</p>
       </div>
     </a>
     <a class="right-next"

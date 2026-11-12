@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Benchmarks &#8212; DataFusion Variant  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=5ed1a2f5" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
+
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'benchmarks';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="prev" title="SQL function reference" href="sql-reference.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">DataFusion Variant  documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paths.html">Variant paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shredding.html">Variant shredding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sql-reference.html">SQL function reference</a></li>
+<li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Cookbook</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="cookbook/load-and-query-json.html">Load and query JSON</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook/store-and-read-parquet.html">Store and read Parquet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook/convert-sql-types.html">Convert to and from SQL types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook/common-pitfalls.html">Common pitfalls</a></li>
+</ul>
+
+  </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-house"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Benchmarks</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="benchmarks">
+<h1>Benchmarks<a class="headerlink" href="#benchmarks" title="Link to this heading">#</a></h1>
+<p>datafusion-variant has two kinds of benchmarks:</p>
+<ul class="simple">
+<li><p><strong>Function benchmarks</strong> time one function at a time on in-memory arrays with
+<a class="reference external" href="https://github.com/bheisler/criterion.rs">Criterion</a>. Run them with <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">bench</span></code>, for example
+<code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">bench</span> <span class="pre">--bench</span> <span class="pre">variant_get</span></code>. The <a class="reference external" href="https://github.com/datafusion-contrib/datafusion-variant/blob/main/benches/README.md">function benchmark guide</a>
+describes each benchmark and how to compare a change against a baseline.</p></li>
+<li><p><strong>SQL benchmarks</strong> time whole queries over Parquet files with <code class="docutils literal notranslate"><span class="pre">dfv</span></code>.
+JSONBench, below, is the first.</p></li>
+</ul>
+<section id="jsonbench-on-parquet-variant">
+<h2>JSONBench on Parquet Variant<a class="headerlink" href="#jsonbench-on-parquet-variant" title="Link to this heading">#</a></h2>
+<p>The five <a class="reference external" href="https://github.com/ClickHouse/JSONBench/blob/e6c7c98dc766394d51f7d506a3dd2b5d51165d70/clickhouse/queries.sql">JSONBench queries</a>
+over the Bluesky events, stored as Parquet Variant in three layouts
+(<a class="reference external" href="https://github.com/datafusion-contrib/datafusion-variant/issues/175">#175</a>)
+and run with <code class="docutils literal notranslate"><span class="pre">dfv</span></code>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Layout</p></th>
+<th class="head"><p>Fields shredded</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">unshredded</span></code></p></td>
+<td><p>None</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">shredded</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">kind</span></code>, <code class="docutils literal notranslate"><span class="pre">did</span></code>, <code class="docutils literal notranslate"><span class="pre">time_us</span></code>, <code class="docutils literal notranslate"><span class="pre">commit.collection</span></code>, <code class="docutils literal notranslate"><span class="pre">commit.operation</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mixed</span></code></p></td>
+<td><p>None in files 1 to 20, as in <code class="docutils literal notranslate"><span class="pre">shredded</span></code> in files 21 to 100</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Run the commands below from the repository root.</p>
+<section id="preparing-the-data">
+<h3>Preparing the data<a class="headerlink" href="#preparing-the-data" title="Link to this heading">#</a></h3>
+<p>Each layout's <code class="docutils literal notranslate"><span class="pre">load.sql</span></code> reads Bluesky files 1 to 100 (100M rows) with
+<code class="docutils literal notranslate"><span class="pre">load_bsky</span></code>, which downloads missing files to <code class="docutils literal notranslate"><span class="pre">data/bluesky</span></code> (about 135 MB
+each), and writes Parquet to <code class="docutils literal notranslate"><span class="pre">data/jsonbench/&lt;layout&gt;</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>build<span class="w"> </span>--release<span class="w"> </span>--bin<span class="w"> </span>dfv
+target/release/dfv<span class="w"> </span>-f<span class="w"> </span>benchmarks/jsonbench/unshredded/load.sql
+target/release/dfv<span class="w"> </span>-f<span class="w"> </span>benchmarks/jsonbench/shredded/load.sql
+target/release/dfv<span class="w"> </span>-f<span class="w"> </span>benchmarks/jsonbench/mixed/load.sql
+</pre></div>
+</div>
+<p>To load fewer files, change the <code class="docutils literal notranslate"><span class="pre">load_bsky</span></code> ranges: for example
+<code class="docutils literal notranslate"><span class="pre">load_bsky(1,</span> <span class="pre">10)</span></code> for 10M rows, and <code class="docutils literal notranslate"><span class="pre">load_bsky(1,</span> <span class="pre">2)</span></code> and <code class="docutils literal notranslate"><span class="pre">load_bsky(3,</span> <span class="pre">10)</span></code> in
+<code class="docutils literal notranslate"><span class="pre">mixed/load.sql</span></code>. <code class="docutils literal notranslate"><span class="pre">COPY</span></code> adds files to the layout directory, so delete it before
+loading again. <code class="docutils literal notranslate"><span class="pre">dfv</span> <span class="pre">-f</span></code> reports a failed statement but still exits successfully,
+so check the output for errors.</p>
+<p>The scripts write Snappy Parquet with 65,536-row row groups and about 1M rows
+per file. Fields a layout does not shred stay in the residual Variant. Shredded
+strings are <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> and <code class="docutils literal notranslate"><span class="pre">time_us</span></code> is <code class="docutils literal notranslate"><span class="pre">BIGINT</span></code>. Some source documents are
+truncated, so the scripts parse with <code class="docutils literal notranslate"><span class="pre">try_parse_json</span></code>, which stores them as
+NULL.</p>
+<p>JSONBench also reports how much storage each layout takes:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>du<span class="w"> </span>-sh<span class="w"> </span>data/jsonbench/*
+</pre></div>
+</div>
+</section>
+<section id="running-the-queries">
+<h3>Running the queries<a class="headerlink" href="#running-the-queries" title="Link to this heading">#</a></h3>
+<p>Each layout's <code class="docutils literal notranslate"><span class="pre">create.sql</span></code> creates the <code class="docutils literal notranslate"><span class="pre">bluesky</span></code> table over its files, so pass
+it before the query files. <code class="docutils literal notranslate"><span class="pre">-i</span> <span class="pre">N</span></code> runs the files N times in one session and
+prints the time of each run, then the minimum, median, and maximum:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>target/release/dfv<span class="w"> </span>-i<span class="w"> </span><span class="m">10</span><span class="w"> </span>-f<span class="w"> </span>benchmarks/jsonbench/shredded/create.sql<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-f<span class="w"> </span>benchmarks/jsonbench/queries/q1.sql
+</pre></div>
+</div>
+<p>The first run also creates the table. <code class="docutils literal notranslate"><span class="pre">dfv</span></code> prints the time of each statement
+as well, so passing several query files times each of them.</p>
+</section>
+<section id="queries">
+<h3>Queries<a class="headerlink" href="#queries" title="Link to this heading">#</a></h3>
+<p>The queries extract <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> and <code class="docutils literal notranslate"><span class="pre">BIGINT</span></code> values with
+<code class="docutils literal notranslate"><span class="pre">variant_get(data,</span> <span class="pre">path,</span> <span class="pre">type)</span></code>, report UTC hours, and order ties
+deterministically. Q5 divides each positive epoch-microsecond endpoint by 1,000
+before subtracting, to count millisecond boundaries as ClickHouse's <code class="docutils literal notranslate"><span class="pre">dateDiff</span></code>
+does.</p>
+<p>Sources (Apache-2.0): <a class="reference external" href="https://github.com/ClickHouse/JSONBench">JSONBench data and queries</a>.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="sql-reference.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">SQL function reference</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="contributing.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Contributing</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
