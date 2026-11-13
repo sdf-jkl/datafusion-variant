@@ -155,6 +155,21 @@
   </ul>
 </div></div>
       
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/datafusion-contrib/datafusion-variant" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
     </div>
     
   </div>
@@ -207,6 +222,21 @@
     <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/datafusion-contrib/datafusion-variant" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
         
       </div>
     
@@ -320,6 +350,10 @@ in <a class="reference external" href="https://github.com/datafusion-contrib/dat
 locally, run:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>docs/requirements.txt
 sphinx-build<span class="w"> </span>-W<span class="w"> </span>--keep-going<span class="w"> </span>-b<span class="w"> </span>html<span class="w"> </span>docs<span class="w"> </span>target/docs
+</pre></div>
+</div>
+<p>Or, if you have <a class="reference external" href="https://docs.astral.sh/uv/">uv</a> installed, build without setting up a Python environment:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uvx<span class="w"> </span>--with-requirements<span class="w"> </span>docs/requirements.txt<span class="w"> </span>--from<span class="w"> </span>sphinx<span class="w"> </span>sphinx-build<span class="w"> </span>-W<span class="w"> </span>--keep-going<span class="w"> </span>-b<span class="w"> </span>html<span class="w"> </span>docs<span class="w"> </span>target/docs
 </pre></div>
 </div>
 <p>Then open <code class="docutils literal notranslate"><span class="pre">target/docs/index.html</span></code>. CI runs the same build, and warnings such as
