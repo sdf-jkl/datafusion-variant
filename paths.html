@@ -298,7 +298,15 @@ path to select a value inside a Variant. Paths follow the Spark 4.2 syntax, a
 small subset of <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc9535.html">JSONPath</a>.</p>
 <p>The examples on this page use this table:</p>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">requests</span><span class="w"> </span><span class="k">AS</span>
-<span class="k">SELECT</span><span class="w"> </span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{"service":"api","user":{"id":7,"roles":["admin","dev"]},"http.status":200,"user-agent":"curl"}'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">request</span><span class="p">;</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{</span>
+<span class="s1">  "service": "api",</span>
+<span class="s1">  "user": {</span>
+<span class="s1">    "id": 7,</span>
+<span class="s1">    "roles": ["admin", "dev"]</span>
+<span class="s1">  },</span>
+<span class="s1">  "http.status": 200,</span>
+<span class="s1">  "user-agent": "curl"</span>
+<span class="s1">}'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">request</span><span class="p">;</span>
 </pre></div>
 </div>
 <section id="syntax">
@@ -326,43 +334,52 @@ steps:</p>
 </div>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="n">variant_get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="s1">'$.user.id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'INT'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">id</span><span class="p">,</span>
 <span class="w">       </span><span class="n">variant_get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="s1">'$.user.roles[1]'</span><span class="p">,</span><span class="w"> </span><span class="s1">'VARCHAR'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">second_role</span><span class="p">,</span>
-<span class="w">       </span><span class="n">variant_get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="s1">'$["http.status"]'</span><span class="p">,</span><span class="w"> </span><span class="s1">'INT'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">status</span>
+<span class="w">       </span><span class="n">variant_get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="s1">'$["http.status"]'</span><span class="p">,</span><span class="w"> </span><span class="s1">'INT'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">status</span><span class="p">,</span>
+<span class="w">       </span><span class="n">variant_get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="s1">'$.http.status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'INT'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">nested_status</span>
 <span class="k">FROM</span><span class="w"> </span><span class="n">requests</span><span class="p">;</span>
 </pre></div>
 </div>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+----+-------------+--------+
-| id | second_role | status |
-+----+-------------+--------+
-| 7  | dev         | 200    |
-+----+-------------+--------+
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+----+-------------+--------+---------------+
+| id | second_role | status | nested_status |
++----+-------------+--------+---------------+
+| 7  | dev         | 200    | NULL          |
++----+-------------+--------+---------------+
 </pre></div>
 </div>
 <!--
 ```sql
 SELECT to_json(variant_get(request, '$')) = to_json(request) AS whole,
-       variant_get(request, '$.user.name') IS NULL AS missing_field,
-       variant_get(request, '$.user.roles[2]') IS NULL AS past_end,
-       variant_get(request, '$.user.roles.id') IS NULL AS field_of_array,
        variant_get(request, '$.User') IS NULL AS other_case,
-       variant_get(parse_json('{"*":1}'), '$.*', 'INT') AS star
-FROM requests;
+       variant_get(v, '$.*', 'INT') AS star,
+       variant_get(v, '$["a]b"]', 'INT') AS bracket,
+       variant_get(v, '$["$"]', 'INT') AS dollar,
+       variant_get(v, '$["a\b"]', 'INT') AS backslash,
+       variant_get(v, '$["it''s"]', 'INT') AS quote
+FROM requests, (SELECT parse_json('{"*":0,"a]b":1,"$":2,"a\\b":3,"it''s":4}') AS v);
 ```
 
 ```text
-+-------+---------------+----------+----------------+------------+------+
-| whole | missing_field | past_end | field_of_array | other_case | star |
-+-------+---------------+----------+----------------+------------+------+
-| true  | true          | true     | true           | true       | 1    |
-+-------+---------------+----------+----------------+------------+------+
++-------+------------+------+---------+--------+-----------+-------+
+| whole | other_case | star | bracket | dollar | backslash | quote |
++-------+------------+------+---------+--------+-----------+-------+
+| true  | true       | 0    | 1       | 2      | 3         | 4     |
++-------+------------+------+---------+--------+-----------+-------+
 ```
 -->
-<p>Field names are case-sensitive, and <code class="docutils literal notranslate"><span class="pre">$.*</span></code> selects a field named <code class="docutils literal notranslate"><span class="pre">*</span></code>, not every
-field. A path that does not match the value, such as a missing field, an index
-past the end of an array, or a field step on an array, returns SQL NULL.</p>
+<p><code class="docutils literal notranslate"><span class="pre">$.http.status</span></code> looks for a field <code class="docutils literal notranslate"><span class="pre">status</span></code> inside an object <code class="docutils literal notranslate"><span class="pre">http</span></code>, so quote a
+name that contains <code class="docutils literal notranslate"><span class="pre">.</span></code> or <code class="docutils literal notranslate"><span class="pre">[</span></code>. Unlike JSONPath, <code class="docutils literal notranslate"><span class="pre">\</span></code> inside quotes is not an
+escape character, so <code class="docutils literal notranslate"><span class="pre">$[&quot;a\b&quot;]</span></code> selects the field <code class="docutils literal notranslate"><span class="pre">a\b</span></code>. Field names are
+case-sensitive.</p>
+<p>Paths have no wildcards, slices, filters, negative indexes, or recursive descent
+(<code class="docutils literal notranslate"><span class="pre">..</span></code>), and <code class="docutils literal notranslate"><span class="pre">$.*</span></code> selects a field named <code class="docutils literal notranslate"><span class="pre">*</span></code>.</p>
+</section>
+<section id="nulls-and-errors">
+<h2>NULLs and errors<a class="headerlink" href="#nulls-and-errors" title="Link to this heading">#</a></h2>
 <!--
 ```sql
 SELECT p, variant_get(request, p, 'VARCHAR') AS value
-FROM requests, (VALUES ('$.service'), ('$.user.roles[0]'), (NULL)) AS paths(p)
+FROM requests,
+     (VALUES ('$.service'), ('$.user.name'), ('$.user.roles[2]'), ('$.user.roles.id'), (NULL)) AS paths(p)
 ORDER BY p;
 ```
 
@@ -371,13 +388,13 @@ ORDER BY p;
 | p               | value |
 +-----------------+-------+
 | $.service       | api   |
-| $.user.roles[0] | admin |
+| $.user.name     | NULL  |
+| $.user.roles.id | NULL  |
+| $.user.roles[2] | NULL  |
 | NULL            | NULL  |
 +-----------------+-------+
 ```
 -->
-<p>The path is a string expression, so it can also come from a column. A SQL NULL
-path returns SQL NULL.</p>
 <!-- readme-test: error: invalid Variant path -->
 <!--
 ```sql
@@ -388,56 +405,22 @@ SELECT variant_get(request, '$.user.roles[-1]') FROM requests;
 SELECT variant_get(request, '$..id') FROM requests;
 ```
 -->
-<p>A path that does not start with <code class="docutils literal notranslate"><span class="pre">$</span></code>, such as <code class="docutils literal notranslate"><span class="pre">user.id</span></code> or an empty string, is
-invalid. Paths have no wildcards, slices, filters, negative indexes, or
-recursive descent (<code class="docutils literal notranslate"><span class="pre">..</span></code>). An invalid path raises an error, even in
-<code class="docutils literal notranslate"><span class="pre">try_variant_get</span></code>.</p>
 <!-- readme-test: error: variant_delete: invalid path -->
 <!--
 ```sql
 SELECT variant_delete(request, '$') FROM requests;
 ```
 -->
-<p><code class="docutils literal notranslate"><span class="pre">variant_delete</span></code> also rejects <code class="docutils literal notranslate"><span class="pre">$</span></code> alone, because it deletes a field or an array
-element.</p>
-</section>
-<section id="field-names-with-special-characters">
-<h2>Field names with special characters<a class="headerlink" href="#field-names-with-special-characters" title="Link to this heading">#</a></h2>
-<p>Use a quoted step for a field name that contains <code class="docutils literal notranslate"><span class="pre">.</span></code> or <code class="docutils literal notranslate"><span class="pre">[</span></code>. <code class="docutils literal notranslate"><span class="pre">$.http.status</span></code>
-selects the field <code class="docutils literal notranslate"><span class="pre">status</span></code> inside an object <code class="docutils literal notranslate"><span class="pre">http</span></code>, while <code class="docutils literal notranslate"><span class="pre">$[&quot;http.status&quot;]</span></code>
-selects the field named <code class="docutils literal notranslate"><span class="pre">http.status</span></code>:</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="n">variant_get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="s1">'$.http.status'</span><span class="p">)</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">nested_missing</span><span class="p">,</span>
-<span class="w">       </span><span class="n">variant_get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="s1">'$["http.status"]'</span><span class="p">,</span><span class="w"> </span><span class="s1">'INT'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">status</span>
-<span class="k">FROM</span><span class="w"> </span><span class="n">requests</span><span class="p">;</span>
-</pre></div>
-</div>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+----------------+--------+
-| nested_missing | status |
-+----------------+--------+
-| true           | 200    |
-+----------------+--------+
-</pre></div>
-</div>
-<!--
-```sql
-SELECT variant_get(v, '$["a]b"]', 'INT') AS bracket,
-       variant_get(v, '$["$"]', 'INT') AS dollar,
-       variant_get(v, '$["a\b"]', 'INT') AS backslash,
-       variant_get(v, '$["it''s"]', 'INT') AS quote
-FROM (SELECT parse_json('{"a]b":1,"$":2,"a\\b":3,"it''s":4}') AS v);
-```
-
-```text
-+---------+--------+-----------+-------+
-| bracket | dollar | backslash | quote |
-+---------+--------+-----------+-------+
-| 1       | 2      | 3         | 4     |
-+---------+--------+-----------+-------+
-```
--->
-<p>Every character between the quotes is part of the name, including <code class="docutils literal notranslate"><span class="pre">]</span></code> and <code class="docutils literal notranslate"><span class="pre">$</span></code>.
-Unlike JSONPath, <code class="docutils literal notranslate"><span class="pre">\</span></code> is not an escape character, so <code class="docutils literal notranslate"><span class="pre">$[&quot;a\b&quot;]</span></code> selects the field
-<code class="docutils literal notranslate"><span class="pre">a\b</span></code>. To select a name that contains <code class="docutils literal notranslate"><span class="pre">'</span></code>, quote it with <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>, and the reverse.</p>
+<ul class="simple">
+<li><p>A path that does not match the value, such as a missing field, an index past
+the end of an array, or a field step on an array, returns SQL NULL.</p></li>
+<li><p>The path can be any string expression, such as a column. A SQL NULL path
+returns SQL NULL.</p></li>
+<li><p>A path that does not start with <code class="docutils literal notranslate"><span class="pre">$</span></code>, such as <code class="docutils literal notranslate"><span class="pre">user.id</span></code> or an empty string, is
+invalid. An invalid path raises an error, even in <code class="docutils literal notranslate"><span class="pre">try_variant_get</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">variant_delete</span></code> also rejects <code class="docutils literal notranslate"><span class="pre">$</span></code> alone, because it deletes a field or an
+array element.</p></li>
+</ul>
 </section>
 <section id="the-operator">
 <h2>The <code class="docutils literal notranslate"><span class="pre">:</span></code> operator<a class="headerlink" href="#the-operator" title="Link to this heading">#</a></h2>
@@ -457,79 +440,62 @@ Unlike JSONPath, <code class="docutils literal notranslate"><span class="pre">\<
 +------------+--------+-------+
 </pre></div>
 </div>
-<p>Write <code class="docutils literal notranslate"><span class="pre">:</span></code> once, at the start of the path, and continue it with <code class="docutils literal notranslate"><span class="pre">.</span></code> and <code class="docutils literal notranslate"><span class="pre">[...]</span></code>:</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p>Expression</p></th>
-<th class="head"><p>Reads</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">request:user.roles[0]</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">$.user.roles[0]</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">request:user:roles[0]</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">$.user</span></code>, then <code class="docutils literal notranslate"><span class="pre">$.roles[0]</span></code> of that result</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">request.user</span></code></p></td>
-<td><p>The struct field <code class="docutils literal notranslate"><span class="pre">user</span></code> (an error)</p></td>
-</tr>
-</tbody>
-</table>
-</div>
 <!--
 ```sql
 SELECT request:user.roles[0]::VARCHAR AS one_path,
-       request:user:roles[0]::VARCHAR AS chained
+       request:user:roles[0]::VARCHAR AS chained,
+       request:`user-agent` IS NULL AS backtick
 FROM requests;
 ```
 
 ```text
-+----------+---------+
-| one_path | chained |
-+----------+---------+
-| admin    | admin   |
-+----------+---------+
++----------+---------+----------+
+| one_path | chained | backtick |
++----------+---------+----------+
+| admin    | admin   | true     |
++----------+---------+----------+
 ```
 -->
 <!-- readme-test: error: Field user not found in struct -->
 <!--
 ```sql
-SELECT request.user FROM requests;
+SELECT request.user.roles[0] FROM requests;
 ```
 -->
-<p>The chained form returns the same value, but it extracts the whole <code class="docutils literal notranslate"><span class="pre">user</span></code> object
-before reading <code class="docutils literal notranslate"><span class="pre">roles[0]</span></code>, which is slower, especially for shredded columns
-(<a class="reference external" href="https://github.com/datafusion-contrib/datafusion-variant/issues/176">#176</a>).
-Without <code class="docutils literal notranslate"><span class="pre">:</span></code>, <code class="docutils literal notranslate"><span class="pre">.</span></code> is DataFusion's struct field access. Variant columns are stored
-as Arrow structs with no <code class="docutils literal notranslate"><span class="pre">user</span></code> field, so <code class="docutils literal notranslate"><span class="pre">request.user</span></code> fails with
-<code class="docutils literal notranslate"><span class="pre">Field</span> <span class="pre">user</span> <span class="pre">not</span> <span class="pre">found</span> <span class="pre">in</span> <span class="pre">struct</span></code>.</p>
 <!-- readme-test: error: No field named agent -->
 <!--
 ```sql
 SELECT request:user-agent FROM requests;
 ```
 -->
-<p>Quote a field name that is not a plain SQL identifier, such as <code class="docutils literal notranslate"><span class="pre">user-agent</span></code>.
-Without quotes, <code class="docutils literal notranslate"><span class="pre">request:user-agent</span></code> subtracts a column named <code class="docutils literal notranslate"><span class="pre">agent</span></code> from
-<code class="docutils literal notranslate"><span class="pre">request:user</span></code>.</p>
-<!--
-```sql
-SELECT request:`user-agent` IS NULL AS backtick
-FROM requests;
-```
-
-```text
-+----------+
-| backtick |
-+----------+
-| true     |
-+----------+
-```
--->
-<p>Backtick-quoted names, such as <code class="docutils literal notranslate"><span class="pre">request:`user-agent`</span></code>, return SQL NULL,
-while Spark selects the field. Use <code class="docutils literal notranslate"><span class="pre">request:['user-agent']</span></code> instead. Support is
-tracked in <a class="reference external" href="https://github.com/datafusion-contrib/datafusion-variant/issues/141">#141</a>.</p>
+<p>Write <code class="docutils literal notranslate"><span class="pre">:</span></code> once, and quote names that are not plain SQL identifiers:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Write</p></th>
+<th class="head"><p>Not</p></th>
+<th class="head"><p>Because</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">request:user.roles[0]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">request:user:roles[0]</span></code></p></td>
+<td><p>Each <code class="docutils literal notranslate"><span class="pre">:</span></code> is a separate lookup, so this reads the whole <code class="docutils literal notranslate"><span class="pre">user</span></code> object first. Same value, but slower, especially when shredded (<a class="reference external" href="https://github.com/datafusion-contrib/datafusion-variant/issues/176">#176</a>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">request:user.roles[0]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">request.user.roles[0]</span></code></p></td>
+<td><p>Without <code class="docutils literal notranslate"><span class="pre">:</span></code>, <code class="docutils literal notranslate"><span class="pre">.</span></code> is struct field access on the Variant's Arrow storage, which fails with <code class="docutils literal notranslate"><span class="pre">Field</span> <span class="pre">user</span> <span class="pre">not</span> <span class="pre">found</span> <span class="pre">in</span> <span class="pre">struct</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">request:['user-agent']</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">request:user-agent</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">-</span></code> subtracts a column named <code class="docutils literal notranslate"><span class="pre">agent</span></code> from <code class="docutils literal notranslate"><span class="pre">request:user</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">request:['user-agent']</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">request:`user-agent`</span></code></p></td>
+<td><p>Backtick-quoted names return SQL NULL for now, while Spark selects the field (<a class="reference external" href="https://github.com/datafusion-contrib/datafusion-variant/issues/141">#141</a>).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 </section>
 
