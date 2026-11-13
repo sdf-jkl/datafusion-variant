@@ -295,7 +295,7 @@
 <h1>Variant paths<a class="headerlink" href="#variant-paths" title="Link to this heading">#</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">variant_get</span></code>, <code class="docutils literal notranslate"><span class="pre">try_variant_get</span></code>, <code class="docutils literal notranslate"><span class="pre">variant_delete</span></code>, and the <code class="docutils literal notranslate"><span class="pre">:</span></code> operator use a
 path to select a value inside a Variant. Paths follow the Spark 4.2 syntax, a
-small subset of JSONPath.</p>
+small subset of <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc9535.html">JSONPath</a>.</p>
 <p>The examples on this page use this table:</p>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">requests</span><span class="w"> </span><span class="k">AS</span>
 <span class="k">SELECT</span><span class="w"> </span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{"service":"api","user":{"id":7,"roles":["admin","dev"]},"http.status":200,"user-agent":"curl"}'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">request</span><span class="p">;</span>
@@ -435,8 +435,9 @@ FROM (SELECT parse_json('{"a]b":1,"$":2,"a\\b":3,"it''s":4}') AS v);
 +---------+--------+-----------+-------+
 ```
 -->
-<p>Every character between the quotes is part of the name, including <code class="docutils literal notranslate"><span class="pre">]</span></code>, <code class="docutils literal notranslate"><span class="pre">$</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">\</span></code>. To select a name that contains <code class="docutils literal notranslate"><span class="pre">'</span></code>, quote it with <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>, and the reverse.</p>
+<p>Every character between the quotes is part of the name, including <code class="docutils literal notranslate"><span class="pre">]</span></code> and <code class="docutils literal notranslate"><span class="pre">$</span></code>.
+Unlike JSONPath, <code class="docutils literal notranslate"><span class="pre">\</span></code> is not an escape character, so <code class="docutils literal notranslate"><span class="pre">$[&quot;a\b&quot;]</span></code> selects the field
+<code class="docutils literal notranslate"><span class="pre">a\b</span></code>. To select a name that contains <code class="docutils literal notranslate"><span class="pre">'</span></code>, quote it with <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>, and the reverse.</p>
 </section>
 <section id="the-operator">
 <h2>The <code class="docutils literal notranslate"><span class="pre">:</span></code> operator<a class="headerlink" href="#the-operator" title="Link to this heading">#</a></h2>
@@ -456,6 +457,53 @@ FROM (SELECT parse_json('{"a]b":1,"$":2,"a\\b":3,"it''s":4}') AS v);
 +------------+--------+-------+
 </pre></div>
 </div>
+<p>Write <code class="docutils literal notranslate"><span class="pre">:</span></code> once, at the start of the path, and continue it with <code class="docutils literal notranslate"><span class="pre">.</span></code> and <code class="docutils literal notranslate"><span class="pre">[...]</span></code>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Expression</p></th>
+<th class="head"><p>Reads</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">request:user.roles[0]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$.user.roles[0]</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">request:user:roles[0]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$.user</span></code>, then <code class="docutils literal notranslate"><span class="pre">$.roles[0]</span></code> of that result</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">request.user</span></code></p></td>
+<td><p>The struct field <code class="docutils literal notranslate"><span class="pre">user</span></code> (an error)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!--
+```sql
+SELECT request:user.roles[0]::VARCHAR AS one_path,
+       request:user:roles[0]::VARCHAR AS chained
+FROM requests;
+```
+
+```text
++----------+---------+
+| one_path | chained |
++----------+---------+
+| admin    | admin   |
++----------+---------+
+```
+-->
+<!-- readme-test: error: Field user not found in struct -->
+<!--
+```sql
+SELECT request.user FROM requests;
+```
+-->
+<p>The chained form returns the same value, but it extracts the whole <code class="docutils literal notranslate"><span class="pre">user</span></code> object
+before reading <code class="docutils literal notranslate"><span class="pre">roles[0]</span></code>, which is slower, especially for shredded columns
+(<a class="reference external" href="https://github.com/datafusion-contrib/datafusion-variant/issues/176">#176</a>).
+Without <code class="docutils literal notranslate"><span class="pre">:</span></code>, <code class="docutils literal notranslate"><span class="pre">.</span></code> is DataFusion's struct field access. Variant columns are stored
+as Arrow structs with no <code class="docutils literal notranslate"><span class="pre">user</span></code> field, so <code class="docutils literal notranslate"><span class="pre">request.user</span></code> fails with
+<code class="docutils literal notranslate"><span class="pre">Field</span> <span class="pre">user</span> <span class="pre">not</span> <span class="pre">found</span> <span class="pre">in</span> <span class="pre">struct</span></code>.</p>
 <!-- readme-test: error: No field named agent -->
 <!--
 ```sql
