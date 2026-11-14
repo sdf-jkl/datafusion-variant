@@ -376,55 +376,50 @@ steps:</p>
 +----+-------------+--------+---------------+
 </pre></div>
 </div>
-<!--
-```sql
-SELECT to_json(variant_get(request, '$')) = to_json(request) AS whole,
-       variant_get(request, '$.User') IS NULL AS other_case,
-       variant_get(v, '$.*', 'INT') AS star,
-       variant_get(v, '$["a]b"]', 'INT') AS bracket,
-       variant_get(v, '$["$"]', 'INT') AS dollar,
-       variant_get(v, '$["a\b"]', 'INT') AS backslash,
-       variant_get(v, '$["it''s"]', 'INT') AS quote
-FROM requests, (SELECT parse_json('{"*":0,"a]b":1,"$":2,"a\\b":3,"it''s":4}') AS v);
-```
-
-```text
-+-------+------------+------+---------+--------+-----------+-------+
-| whole | other_case | star | bracket | dollar | backslash | quote |
-+-------+------------+------+---------+--------+-----------+-------+
-| true  | true       | 0    | 1       | 2      | 3         | 4     |
-+-------+------------+------+---------+--------+-----------+-------+
-```
--->
 <p><code class="docutils literal notranslate"><span class="pre">$.http.status</span></code> looks for a field <code class="docutils literal notranslate"><span class="pre">status</span></code> inside an object <code class="docutils literal notranslate"><span class="pre">http</span></code>, so quote a
 name that contains <code class="docutils literal notranslate"><span class="pre">.</span></code> or <code class="docutils literal notranslate"><span class="pre">[</span></code>. Unlike JSONPath, <code class="docutils literal notranslate"><span class="pre">\</span></code> inside quotes is not an
-escape character, so <code class="docutils literal notranslate"><span class="pre">$[&quot;a\b&quot;]</span></code> selects the field <code class="docutils literal notranslate"><span class="pre">a\b</span></code>. Field names are
-case-sensitive.</p>
-<p>Paths have no wildcards, slices, filters, negative indexes, or recursive descent
-(<code class="docutils literal notranslate"><span class="pre">..</span></code>), and <code class="docutils literal notranslate"><span class="pre">$.*</span></code> selects a field named <code class="docutils literal notranslate"><span class="pre">*</span></code>.</p>
+escape character, and paths have no wildcards, slices, filters, negative
+indexes, or recursive descent (<code class="docutils literal notranslate"><span class="pre">..</span></code>), so <code class="docutils literal notranslate"><span class="pre">$.*</span></code> selects a field named <code class="docutils literal notranslate"><span class="pre">*</span></code>:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="n">variant_get</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="s1">'$["a]b"]'</span><span class="p">,</span><span class="w"> </span><span class="s1">'INT'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">bracket</span><span class="p">,</span>
+<span class="w">       </span><span class="n">variant_get</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="s1">'$["a\b"]'</span><span class="p">,</span><span class="w"> </span><span class="s1">'INT'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">backslash</span><span class="p">,</span>
+<span class="w">       </span><span class="n">variant_get</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="s1">'$["it''s"]'</span><span class="p">,</span><span class="w"> </span><span class="s1">'INT'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">quote</span><span class="p">,</span>
+<span class="w">       </span><span class="n">variant_get</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="s1">'$.*'</span><span class="p">,</span><span class="w"> </span><span class="s1">'INT'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">star</span>
+<span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">parse_json</span><span class="p">(</span><span class="s1">'{"a]b": 1, "a\\b": 2, "it''s": 3, "*": 4}'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">v</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+---------+-----------+-------+------+
+| bracket | backslash | quote | star |
++---------+-----------+-------+------+
+| 1       | 2         | 3     | 4    |
++---------+-----------+-------+------+
+</pre></div>
+</div>
 </section>
 <section id="nulls-and-errors">
 <h2>NULLs and errors<a class="headerlink" href="#nulls-and-errors" title="Link to this heading">#</a></h2>
-<!--
-```sql
-SELECT p, variant_get(request, p, 'VARCHAR') AS value
-FROM requests,
-     (VALUES ('$.service'), ('$.user.name'), ('$.user.roles[2]'), ('$.user.roles.id'), (NULL)) AS paths(p)
-ORDER BY p;
-```
-
-```text
+<p>A path that does not match the value returns SQL NULL, and so does a SQL NULL
+path. The path can be any string expression, such as a column:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">variant_get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="s1">'VARCHAR'</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">value</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">requests</span><span class="p">,</span>
+<span class="w">     </span><span class="p">(</span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">'$.service'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s1">'$.User'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s1">'$.user.name'</span><span class="p">),</span>
+<span class="w">             </span><span class="p">(</span><span class="s1">'$.user.roles[2]'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s1">'$.user.roles.id'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="k">NULL</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">paths</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">path</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+-----------------+-------+
+| path            | value |
 +-----------------+-------+
-| p               | value |
-+-----------------+-------+
+| $.User          | NULL  |
 | $.service       | api   |
 | $.user.name     | NULL  |
 | $.user.roles.id | NULL  |
 | $.user.roles[2] | NULL  |
 | NULL            | NULL  |
 +-----------------+-------+
-```
--->
+</pre></div>
+</div>
+<p>Field names are case-sensitive, so <code class="docutils literal notranslate"><span class="pre">$.User</span></code> does not match <code class="docutils literal notranslate"><span class="pre">user</span></code>, and a field
+step on an array, such as <code class="docutils literal notranslate"><span class="pre">$.user.roles.id</span></code>, does not match either.</p>
 <!-- readme-test: error: invalid Variant path -->
 <!--
 ```sql
@@ -441,16 +436,10 @@ SELECT variant_get(request, '$..id') FROM requests;
 SELECT variant_delete(request, '$') FROM requests;
 ```
 -->
-<ul class="simple">
-<li><p>A path that does not match the value, such as a missing field, an index past
-the end of an array, or a field step on an array, returns SQL NULL.</p></li>
-<li><p>The path can be any string expression, such as a column. A SQL NULL path
-returns SQL NULL.</p></li>
-<li><p>A path that does not start with <code class="docutils literal notranslate"><span class="pre">$</span></code>, such as <code class="docutils literal notranslate"><span class="pre">user.id</span></code> or an empty string, is
-invalid. An invalid path raises an error, even in <code class="docutils literal notranslate"><span class="pre">try_variant_get</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">variant_delete</span></code> also rejects <code class="docutils literal notranslate"><span class="pre">$</span></code> alone, because it deletes a field or an
-array element.</p></li>
-</ul>
+<p>An invalid path raises an error, even in <code class="docutils literal notranslate"><span class="pre">try_variant_get</span></code>. This includes a path
+that does not start with <code class="docutils literal notranslate"><span class="pre">$</span></code>, such as <code class="docutils literal notranslate"><span class="pre">user.id</span></code> or an empty string.
+<code class="docutils literal notranslate"><span class="pre">variant_delete</span></code> also rejects <code class="docutils literal notranslate"><span class="pre">$</span></code> alone, because it deletes a field or an array
+element.</p>
 </section>
 <section id="the-operator">
 <h2>The <code class="docutils literal notranslate"><span class="pre">:</span></code> operator<a class="headerlink" href="#the-operator" title="Link to this heading">#</a></h2>
@@ -458,34 +447,34 @@ array element.</p></li>
 <code class="docutils literal notranslate"><span class="pre">$</span></code> when the path starts with <code class="docutils literal notranslate"><span class="pre">[</span></code>. So <code class="docutils literal notranslate"><span class="pre">request:user.roles[0]</span></code> reads
 <code class="docutils literal notranslate"><span class="pre">$.user.roles[0]</span></code>, and <code class="docutils literal notranslate"><span class="pre">request:['http.status']</span></code> reads <code class="docutils literal notranslate"><span class="pre">$['http.status']</span></code>:</p>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="n">request</span><span class="p">:</span><span class="k">user</span><span class="p">.</span><span class="n">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]::</span><span class="nb">VARCHAR</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">first_role</span><span class="p">,</span>
-<span class="w">       </span><span class="n">request</span><span class="p">:[</span><span class="s1">'http.status'</span><span class="p">]::</span><span class="nb">INT</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">status</span><span class="p">,</span>
-<span class="w">       </span><span class="n">request</span><span class="p">:[</span><span class="s1">'user-agent'</span><span class="p">]::</span><span class="nb">VARCHAR</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">agent</span>
+<span class="w">       </span><span class="n">request</span><span class="p">:[</span><span class="s1">'http.status'</span><span class="p">]::</span><span class="nb">INT</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">status</span>
 <span class="k">FROM</span><span class="w"> </span><span class="n">requests</span><span class="p">;</span>
 </pre></div>
 </div>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+------------+--------+-------+
-| first_role | status | agent |
-+------------+--------+-------+
-| admin      | 200    | curl  |
-+------------+--------+-------+
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+------------+--------+
+| first_role | status |
++------------+--------+
+| admin      | 200    |
++------------+--------+
 </pre></div>
 </div>
-<!--
-```sql
-SELECT request:user.roles[0]::VARCHAR AS one_path,
-       request:user:roles[0]::VARCHAR AS chained,
-       request:`user-agent` IS NULL AS backtick
-FROM requests;
-```
-
-```text
-+----------+---------+----------+
-| one_path | chained | backtick |
-+----------+---------+----------+
-| admin    | admin   | true     |
-+----------+---------+----------+
-```
--->
+<p>Chaining <code class="docutils literal notranslate"><span class="pre">:</span></code> reads the same path. Backtick-quoted names return SQL NULL for now,
+while Spark selects the field
+(<a class="reference external" href="https://github.com/datafusion-contrib/datafusion-variant/issues/141">#141</a>),
+so quote them with brackets instead:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="n">request</span><span class="p">:</span><span class="k">user</span><span class="p">:</span><span class="n">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]::</span><span class="nb">VARCHAR</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">chained</span><span class="p">,</span>
+<span class="w">       </span><span class="n">request</span><span class="p">:</span><span class="o">`</span><span class="k">user</span><span class="o">-</span><span class="n">agent</span><span class="o">`</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">backtick</span><span class="p">,</span>
+<span class="w">       </span><span class="n">request</span><span class="p">:[</span><span class="s1">'user-agent'</span><span class="p">]::</span><span class="nb">VARCHAR</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">bracket</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">requests</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+---------+----------+---------+
+| chained | backtick | bracket |
++---------+----------+---------+
+| admin   | NULL     | curl    |
++---------+----------+---------+
+</pre></div>
+</div>
 <!-- readme-test: error: Field user not found in struct -->
 <!--
 ```sql
@@ -498,8 +487,7 @@ SELECT request.user.roles[0] FROM requests;
 SELECT request:user-agent FROM requests;
 ```
 -->
-<p>Chaining <code class="docutils literal notranslate"><span class="pre">:</span></code> reads the same path, so <code class="docutils literal notranslate"><span class="pre">request:user:roles[0]</span></code> returns the same
-value as <code class="docutils literal notranslate"><span class="pre">request:user.roles[0]</span></code>. These forms do not work as expected:</p>
+<p>These forms fail:</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head"><p>Write</p></th>
@@ -514,11 +502,7 @@ value as <code class="docutils literal notranslate"><span class="pre">request:us
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">request:['user-agent']</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">request:user-agent</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">-</span></code> subtracts a column named <code class="docutils literal notranslate"><span class="pre">agent</span></code> from <code class="docutils literal notranslate"><span class="pre">request:user</span></code>.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">request:['user-agent']</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">request:`user-agent`</span></code></p></td>
-<td><p>Backtick-quoted names return SQL NULL for now, while Spark selects the field (<a class="reference external" href="https://github.com/datafusion-contrib/datafusion-variant/issues/141">#141</a>).</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">-</span></code> subtracts a column named <code class="docutils literal notranslate"><span class="pre">agent</span></code> from <code class="docutils literal notranslate"><span class="pre">request:user</span></code>, which fails with <code class="docutils literal notranslate"><span class="pre">No</span> <span class="pre">field</span> <span class="pre">named</span> <span class="pre">agent</span></code>.</p></td>
 </tr>
 </tbody>
 </table>
